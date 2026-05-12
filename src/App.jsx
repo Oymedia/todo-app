@@ -16,6 +16,7 @@ function App() {
     }
   })
   const [input, setInput] = useState('')
+  const [dueDate, setDueDate] = useState('')
   const [filter, setFilter] = useState('all')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
@@ -30,8 +31,9 @@ function App() {
     e.preventDefault()
     const trimmed = input.trim()
     if (!trimmed) return
-    setTodos([...todos, { id: Date.now(), text: trimmed, done: false }])
+    setTodos([...todos, { id: Date.now(), text: trimmed, done: false, dueDate: dueDate || null }])
     setInput('')
+    setDueDate('')
   }
 
   const toggleTodo = (id) => {
@@ -92,6 +94,17 @@ function App() {
     setDragOverId(null)
   }
 
+  const formatDueDate = (dateStr) => {
+    if (!dateStr) return null
+    const today = new Date(); today.setHours(0,0,0,0)
+    const due = new Date(dateStr + 'T00:00:00')
+    const diff = Math.round((due - today) / 86400000)
+    if (diff < 0) return { label: `Overdue by ${-diff}d`, status: 'overdue' }
+    if (diff === 0) return { label: 'Due today', status: 'today' }
+    if (diff === 1) return { label: 'Due tomorrow', status: 'soon' }
+    return { label: `Due ${due.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}`, status: 'future' }
+  }
+
   const visible = todos.filter(t => {
     if (filter === 'active') return !t.done
     if (filter === 'done') return t.done
@@ -110,6 +123,12 @@ function App() {
           onChange={e => setInput(e.target.value)}
           placeholder="What needs to be done?"
           autoFocus
+        />
+        <input
+          type="date"
+          className="date-picker"
+          value={dueDate}
+          onChange={e => setDueDate(e.target.value)}
         />
         <button type="submit">Add</button>
       </form>
@@ -136,18 +155,24 @@ function App() {
               checked={todo.done}
               onChange={() => toggleTodo(todo.id)}
             />
-            {editingId === todo.id ? (
-              <input
-                className="edit-input"
-                value={editText}
-                onChange={e => setEditText(e.target.value)}
-                onBlur={() => commitEdit(todo.id)}
-                onKeyDown={e => handleEditKeyDown(e, todo.id)}
-                autoFocus
-              />
-            ) : (
-              <span onDoubleClick={() => startEdit(todo)}>{todo.text}</span>
-            )}
+            <div className="todo-body">
+              {editingId === todo.id ? (
+                <input
+                  className="edit-input"
+                  value={editText}
+                  onChange={e => setEditText(e.target.value)}
+                  onBlur={() => commitEdit(todo.id)}
+                  onKeyDown={e => handleEditKeyDown(e, todo.id)}
+                  autoFocus
+                />
+              ) : (
+                <span onDoubleClick={() => startEdit(todo)}>{todo.text}</span>
+              )}
+              {todo.dueDate && (() => {
+                const d = formatDueDate(todo.dueDate)
+                return !todo.done && <span className={`due-badge due-${d.status}`}>{d.label}</span>
+              })()}
+            </div>
             <button className="delete" onClick={() => deleteTodo(todo.id)} aria-label="Delete">×</button>
           </li>
         ))}

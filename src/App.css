@@ -52,6 +52,21 @@ h1 {
   border-color: #4f46e5;
 }
 
+.add-form .date-picker {
+  padding: 10px 8px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  color: #6b7280;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.add-form .date-picker:focus {
+  border-color: #4f46e5;
+}
+
 .add-form button {
   padding: 10px 18px;
   background: #4f46e5;
@@ -104,7 +119,7 @@ h1 {
   border-bottom: none;
 }
 
-.todo-list li.done span {
+.todo-list li.done .todo-body span {
   text-decoration: line-through;
   color: #9ca3af;
 }
@@ -117,13 +132,33 @@ h1 {
   flex-shrink: 0;
 }
 
-.todo-list li span {
+.todo-body {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.todo-list li span {
   font-size: 15px;
   color: #111827;
   word-break: break-word;
   cursor: text;
 }
+
+.due-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.due-overdue { background: #fee2e2; color: #dc2626; }
+.due-today   { background: #fef9c3; color: #b45309; }
+.due-soon    { background: #e0f2fe; color: #0369a1; }
+.due-future  { background: #f3f4f6; color: #6b7280; }
 
 .todo-list li .edit-input {
   flex: 1;
