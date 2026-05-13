@@ -154,6 +154,51 @@ h1 {
   background: var(--accent-hover);
 }
 
+.tag-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  min-height: 32px;
+}
+
+.tag-input {
+  flex: 1;
+  min-width: 140px;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text);
+  background: transparent;
+  padding: 2px 4px;
+}
+
+.tag-input::placeholder { color: var(--text-muted); }
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px 2px 8px;
+  border-radius: 999px;
+}
+
+.tag-chip button {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.tag-chip button:hover { color: #fff; }
+
 .todo-list {
   list-style: none;
   margin-bottom: 16px;
@@ -287,6 +332,89 @@ body.dark .due-soon    { background: #0c2a41; color: #7dd3fc; }
 .todo-list li .delete:hover {
   color: #ef4444;
 }
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.tag-list .tag-chip {
+  background: var(--border-sub);
+  color: var(--accent);
+  font-size: 11px;
+  padding: 1px 6px;
+  gap: 2px;
+}
+
+.tag-list .tag-chip.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.tag-list .tag-chip.active .tag-filter-btn { color: #fff; }
+.tag-list .tag-chip.active .tag-remove     { color: rgba(255,255,255,0.8); }
+
+.tag-filter-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+
+.tag-remove:hover { color: #ef4444; }
+
+.tag-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0 12px;
+  border-top: 1px solid var(--border-sub);
+}
+
+.tag-filter-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tag-filter-chip {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tag-filter-chip:hover    { border-color: var(--accent); color: var(--accent); }
+.tag-filter-chip.active   { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.tag-filter-clear {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.tag-filter-clear:hover { color: #ef4444; }
 
 .footer {
   display: flex;

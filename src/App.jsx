@@ -19,7 +19,10 @@ function App() {
   const [input, setInput] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState('none')
+  const [tagInput, setTagInput] = useState('')
+  const [pendingTags, setPendingTags] = useState([])
   const [filter, setFilter] = useState('all')
+  const [tagFilter, setTagFilter] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [dragOverId, setDragOverId] = useState(null)
@@ -38,10 +41,11 @@ function App() {
     e.preventDefault()
     const trimmed = input.trim()
     if (!trimmed) return
-    setTodos([...todos, { id: Date.now(), text: trimmed, done: false, dueDate: dueDate || null, priority }])
+    setTodos([...todos, { id: Date.now(), text: trimmed, done: false, dueDate: dueDate || null, priority, tags: pendingTags }])
     setInput('')
     setDueDate('')
     setPriority('none')
+    setPendingTags([])
   }
 
   const toggleTodo = (id) => {
@@ -69,6 +73,24 @@ function App() {
     if (e.key === 'Enter') commitEdit(id)
     if (e.key === 'Escape') setEditingId(null)
   }
+
+  const addPendingTag = (raw) => {
+    const tag = raw.trim().toLowerCase().replace(/\s+/g, '-')
+    if (tag && !pendingTags.includes(tag)) setPendingTags([...pendingTags, tag])
+    setTagInput('')
+  }
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addPendingTag(tagInput) }
+    if (e.key === ',')     { e.preventDefault(); addPendingTag(tagInput) }
+    if (e.key === 'Backspace' && !tagInput) setPendingTags(pendingTags.slice(0, -1))
+  }
+
+  const removeTag = (id, tag) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, tags: (t.tags || []).filter(g => g !== tag) } : t))
+  }
+
+  const allTags = [...new Set(todos.flatMap(t => t.tags || []))]
 
   const PRIORITIES = ['none', 'low', 'medium', 'high']
   const cyclePriority = (id, current) => {
@@ -120,8 +142,9 @@ function App() {
   }
 
   const visible = todos.filter(t => {
-    if (filter === 'active') return !t.done
-    if (filter === 'done') return t.done
+    if (filter === 'active' && t.done) return false
+    if (filter === 'done' && !t.done) return false
+    if (tagFilter && !(t.tags || []).includes(tagFilter)) return false
     return true
   })
 
@@ -161,6 +184,23 @@ function App() {
         </select>
         <button type="submit">Add</button>
       </form>
+
+      <div className="tag-input-row">
+        {pendingTags.map(tag => (
+          <span key={tag} className="tag-chip">
+            #{tag}
+            <button onClick={() => setPendingTags(pendingTags.filter(t => t !== tag))}>×</button>
+          </span>
+        ))}
+        <input
+          className="tag-input"
+          value={tagInput}
+          onChange={e => setTagInput(e.target.value)}
+          onKeyDown={handleTagKeyDown}
+          onBlur={() => tagInput && addPendingTag(tagInput)}
+          placeholder={pendingTags.length === 0 ? 'Add tags (Enter or comma)…' : ''}
+        />
+      </div>
 
       <ul className="todo-list">
         {visible.length === 0 && (
@@ -217,11 +257,35 @@ function App() {
                 const d = formatDueDate(todo.dueDate)
                 return !todo.done && <span className={`due-badge due-${d.status}`}>{d.label}</span>
               })()}
+              {(todo.tags || []).length > 0 && (
+                <div className="tag-list">
+                  {todo.tags.map(tag => (
+                    <span key={tag} className={`tag-chip ${tagFilter === tag ? 'active' : ''}`}>
+                      <button className="tag-filter-btn" onClick={() => setTagFilter(tagFilter === tag ? null : tag)}>#{tag}</button>
+                      <button className="tag-remove" onClick={() => removeTag(todo.id, tag)}>×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <button className="delete" onClick={() => deleteTodo(todo.id)} aria-label="Delete">×</button>
           </li>
         ))}
       </ul>
+
+      {allTags.length > 0 && (
+        <div className="tag-filter-bar">
+          <span className="tag-filter-label">Tags:</span>
+          {allTags.map(tag => (
+            <button
+              key={tag}
+              className={`tag-filter-chip ${tagFilter === tag ? 'active' : ''}`}
+              onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+            >#{tag}</button>
+          ))}
+          {tagFilter && <button className="tag-filter-clear" onClick={() => setTagFilter(null)}>✕ clear</button>}
+        </div>
+      )}
 
       <div className="footer">
         <span>{remaining} item{remaining !== 1 ? 's' : ''} left</span>
