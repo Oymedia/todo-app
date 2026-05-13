@@ -23,6 +23,7 @@ function App() {
   const [pendingTags, setPendingTags] = useState([])
   const [filter, setFilter] = useState('all')
   const [tagFilter, setTagFilter] = useState(null)
+  const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [dragOverId, setDragOverId] = useState(null)
@@ -141,10 +142,27 @@ function App() {
     return { label: `Due ${due.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}`, status: 'future' }
   }
 
+  const searchQuery = search.trim().toLowerCase()
+
+  const highlight = (text) => {
+    if (!searchQuery) return text
+    const idx = text.toLowerCase().indexOf(searchQuery)
+    if (idx === -1) return text
+    return (
+      <>
+        {text.slice(0, idx)}
+        <mark>{text.slice(idx, idx + searchQuery.length)}</mark>
+        {text.slice(idx + searchQuery.length)}
+      </>
+    )
+  }
+
   const visible = todos.filter(t => {
     if (filter === 'active' && t.done) return false
     if (filter === 'done' && !t.done) return false
     if (tagFilter && !(t.tags || []).includes(tagFilter)) return false
+    if (searchQuery && !t.text.toLowerCase().includes(searchQuery) &&
+        !(t.tags || []).some(tag => tag.includes(searchQuery))) return false
     return true
   })
 
@@ -157,6 +175,16 @@ function App() {
         <button className="theme-toggle" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
           {dark ? '☀️' : '🌙'}
         </button>
+      </div>
+
+      <div className="search-bar">
+        <span className="search-icon">🔍</span>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search todos…"
+        />
+        {search && <button className="search-clear" onClick={() => setSearch('')}>×</button>}
       </div>
 
       <form onSubmit={addTodo} className="add-form">
@@ -251,7 +279,7 @@ function App() {
                   autoFocus
                 />
               ) : (
-                <span onDoubleClick={() => startEdit(todo)}>{todo.text}</span>
+                <span onDoubleClick={() => startEdit(todo)}>{highlight(todo.text)}</span>
               )}
               {todo.dueDate && (() => {
                 const d = formatDueDate(todo.dueDate)
