@@ -15,6 +15,7 @@ function App() {
       return []
     }
   })
+  const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
   const [input, setInput] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [filter, setFilter] = useState('all')
@@ -26,6 +27,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
   }, [todos])
+
+  useEffect(() => {
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
+    document.body.classList.toggle('dark', dark)
+  }, [dark])
 
   const addTodo = (e) => {
     e.preventDefault()
@@ -115,7 +121,12 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Todo</h1>
+      <div className="header">
+        <h1>Todo</h1>
+        <button className="theme-toggle" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
+          {dark ? '☀️' : '🌙'}
+        </button>
+      </div>
 
       <form onSubmit={addTodo} className="add-form">
         <input
