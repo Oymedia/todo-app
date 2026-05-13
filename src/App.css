@@ -122,6 +122,22 @@ h1 {
   border-color: var(--accent);
 }
 
+.add-form .priority-select {
+  padding: 10px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: var(--bg-input);
+  transition: border-color 0.2s;
+}
+
+.add-form .priority-select:focus {
+  border-color: var(--accent);
+}
+
 .add-form button {
   padding: 10px 18px;
   background: var(--accent);
@@ -178,6 +194,32 @@ h1 {
   text-decoration: line-through;
   color: var(--text-done);
 }
+
+.priority-pill {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s;
+}
+
+.priority-pill:hover { opacity: 0.75; }
+
+.priority-none   { background: var(--border-sub); color: var(--text-muted); }
+.priority-low    { background: #dcfce7; color: #16a34a; }
+.priority-medium { background: #fef9c3; color: #b45309; }
+.priority-high   { background: #fee2e2; color: #dc2626; }
+
+body.dark .priority-low    { background: #052e16; color: #4ade80; }
+body.dark .priority-medium { background: #422006; color: #fcd34d; }
+body.dark .priority-high   { background: #450a0a; color: #fca5a5; }
 
 .todo-list li input[type="checkbox"] {
   width: 18px;

@@ -18,6 +18,7 @@ function App() {
   const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
   const [input, setInput] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [priority, setPriority] = useState('none')
   const [filter, setFilter] = useState('all')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
@@ -37,9 +38,10 @@ function App() {
     e.preventDefault()
     const trimmed = input.trim()
     if (!trimmed) return
-    setTodos([...todos, { id: Date.now(), text: trimmed, done: false, dueDate: dueDate || null }])
+    setTodos([...todos, { id: Date.now(), text: trimmed, done: false, dueDate: dueDate || null, priority }])
     setInput('')
     setDueDate('')
+    setPriority('none')
   }
 
   const toggleTodo = (id) => {
@@ -66,6 +68,12 @@ function App() {
   const handleEditKeyDown = (e, id) => {
     if (e.key === 'Enter') commitEdit(id)
     if (e.key === 'Escape') setEditingId(null)
+  }
+
+  const PRIORITIES = ['none', 'low', 'medium', 'high']
+  const cyclePriority = (id, current) => {
+    const next = PRIORITIES[(PRIORITIES.indexOf(current) + 1) % PRIORITIES.length]
+    setTodos(todos.map(t => t.id === id ? { ...t, priority: next } : t))
   }
 
   const clearCompleted = () => {
@@ -141,6 +149,16 @@ function App() {
           value={dueDate}
           onChange={e => setDueDate(e.target.value)}
         />
+        <select
+          className="priority-select"
+          value={priority}
+          onChange={e => setPriority(e.target.value)}
+        >
+          <option value="none">— Priority</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
         <button type="submit">Add</button>
       </form>
 
@@ -161,6 +179,22 @@ function App() {
             onDrop={() => handleDrop(todo.id)}
             onDragEnd={handleDragEnd}
           >
+            {todo.priority && todo.priority !== 'none' && (
+              <button
+                className={`priority-pill priority-${todo.priority}`}
+                onClick={() => cyclePriority(todo.id, todo.priority)}
+                aria-label={`Priority: ${todo.priority}`}
+              >
+                {todo.priority[0].toUpperCase()}
+              </button>
+            )}
+            {(!todo.priority || todo.priority === 'none') && (
+              <button
+                className="priority-pill priority-none"
+                onClick={() => cyclePriority(todo.id, 'none')}
+                aria-label="Set priority"
+              >·</button>
+            )}
             <input
               type="checkbox"
               checked={todo.done}
