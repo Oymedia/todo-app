@@ -166,7 +166,10 @@ function App() {
     return true
   })
 
-  const remaining = todos.filter(t => !t.done).length
+  const total = todos.length
+  const done = todos.filter(t => t.done).length
+  const remaining = total - done
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100)
 
   return (
     <div className="app">
@@ -176,6 +179,18 @@ function App() {
           {dark ? '☀️' : '🌙'}
         </button>
       </div>
+
+      {total > 0 && (
+        <div className="progress-section">
+          <div className="progress-stats">
+            <span>{done} of {total} done</span>
+            <span className="progress-pct">{pct}%</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      )}
 
       <div className="search-bar">
         <span className="search-icon">🔍</span>
